@@ -71,12 +71,10 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 		//Filter Neighbors values at same time stamp
 		for(String senseVal: sensorValues){
 			String[] vKValues= senseVal.split(",");
-			if(vKValues[2] == vAValues[2]){
+			if(vKValues[2].contentEquals(vAValues[2])){
 				findNeighborsVal[counterVK++]  = Integer.parseInt(vKValues[1]);
 				System.out.print("Find Neighbors: " +findNeighborsVal[counterVK-1] + "\n");
 			}
-			System.out.print("Neighbors: " +vKValues[2] +","+vAValues[2] + "\n");
-
 		}
 		
 		//Compute sum of all neighbors
@@ -85,22 +83,32 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 			sumOfNeighbors += findNeighborsVal[i];
 		}
 		//Compute mean of all neighbors
-		Double meanOfNeighbors =sumOfNeighbors/findNeighborsVal.length;
+		Double meanOfNeighbors =sumOfNeighbors/counterVK;
 		Double sumSquares=0.0;
 		//Compute Standrd Deviation of all neighbors
 		for(int i =0;i<findNeighborsVal.length;i++){
 			if(findNeighborsVal[i]!=null)
 			sumSquares += (meanOfNeighbors - findNeighborsVal[i])*(meanOfNeighbors - findNeighborsVal[i]);
 		}	
-		Double standardDeviation = Math.sqrt(sumSquares/findNeighborsVal.length);
+		System.out.print("Number of Neighbors: " + counterVK+ "\n");
+
+		System.out.print("Sum of Squares: " + sumSquares+ "\n");
+		
+		Double standardDeviation = Math.sqrt(sumSquares/counterVK);
+		System.out.print("Standard Deviation: " + standardDeviation+ "\n");
+
 		
 		//Compute LISA Algorithm
 		Double lisaEqPart1 = (vA - meanOfNeighbors)/standardDeviation;
+		System.out.print("Lisa Part1: " + lisaEqPart1+ "\n");
+
 		Double lisaPart2 = 0.0;
+		System.out.print("Lisa Part2: " + lisaPart2+ "\n");
+
 		if(findNeighborsVal.length>1){
 		for(int i = 1;i<findNeighborsVal.length; i++){
 			if(findNeighborsVal[i]!=null)
-		  lisaPart2 += (1/findNeighborsVal.length) * ((findNeighborsVal[i]-meanOfNeighbors)/standardDeviation);	
+		  lisaPart2 += (1/counterVK) * ((findNeighborsVal[i]-meanOfNeighbors)/standardDeviation);	
 		}
 		}
 		computeLisa = lisaEqPart1 * lisaPart2;

@@ -55,7 +55,7 @@ public class SensorEmitter implements IRichSpout {
 			return;
 		} 
 		//Open the reader
-		String fromfileData = lastNlines(fileSensor,1);
+		String fromfileData = lastNlines(fileSensor,20);
 		String[] tokens=fromfileData.split("[\n]");  
 		System.out.print("data coming from file" + fromfileData + "tokens" + tokens);
 		try{
