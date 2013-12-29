@@ -4,6 +4,7 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
+import bolts.LISABoltOutputJSon;
 import bolts.SensorRealTimeGetter;
 import bolts.SensorRealTimeLevel2Bolt;
 import bolts.WordCounter;
@@ -22,6 +23,8 @@ public class TopologyMain {
 			.allGrouping("SensorEmitter");
 		builder.setBolt("SensorBolt2", new SensorRealTimeLevel2Bolt(),6)
 		.fieldsGrouping("SensorGetter", new Fields("groupIds"));
+		builder.setBolt("SensorLisaBolt", new LISABoltOutputJSon(),6)
+		.shuffleGrouping("SensorBolt2");
 		/*LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("SensorTtopology", conf, builder.createTopology());
         Thread.sleep(600000);
@@ -43,7 +46,7 @@ public class TopologyMain {
 		//                conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 3);
 		//System.setProperty("storm.jar", "/home/simpal/storm-book-examples-ch02-getting_started-8e42636/target/Getting-Started-0.0.1-SNAPSHOT.jar");
 		try {
-		        StormSubmitter.submitTopology("SensorT106topology", conf,
+		        StormSubmitter.submitTopology("SensorT113topology", conf,
 		                builder.createTopology());
 		        Thread.sleep(30000);
 		        
