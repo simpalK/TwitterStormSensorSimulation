@@ -19,6 +19,8 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -29,7 +31,7 @@ import org.json.simple.JSONObject;
 public class LISABoltOutputJSon implements IRichBolt {
 
 	  private static final long serialVersionUID = 1L;
-      private static final String jsonFilePath = "/home/simpal/stormSensorReco/SensorSimulation/SensorSimulations/StormSensorApp/jsonSensorFile.json";
+      private static final String jsonFilePath = "/home/simpal/stormSensorReco/SensorSimulation/SensorSimulations/StormSensorApp/jsonSensorFile.txt";
 	  FileWriter jsonFileWriter;
 
 	  private OutputCollector collector;
@@ -64,13 +66,7 @@ public class LISABoltOutputJSon implements IRichBolt {
 		this.counters = new HashMap<String, String>();
 		this.name = context.getThisComponentId();
 		this.id = context.getThisTaskId();
-		try {
-			jsonFileWriter = new FileWriter(jsonFilePath);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		
 		
 	}
 	@Override
@@ -80,8 +76,21 @@ public class LISABoltOutputJSon implements IRichBolt {
 		String dat = input.getString(1);
 		String[] sensorValues = dat.split(",");
 		Double lisaVal = input.getDouble(2);
+		String value= gid + "," + dat + "," + lisaVal ;
 		
-		JSONObject jsonObject = new JSONObject();
+		try {
+			File file = new File(jsonFilePath);
+			jsonFileWriter = new FileWriter(file.getAbsoluteFile(),true);
+			BufferedWriter bw = new BufferedWriter(jsonFileWriter);			
+			bw.write(value);
+			bw.newLine();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*JSONObject jsonObject = new JSONObject();
 
 		jsonObject.put("groupId", gid);
 
@@ -99,7 +108,7 @@ public class LISABoltOutputJSon implements IRichBolt {
 
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 		//Compute mean of all neighbors
 		
 		collector.ack(input);
