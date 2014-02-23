@@ -8,6 +8,7 @@ import java.sql.Date;
 import java.io.File;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -23,8 +24,11 @@ public class SensorEmitter implements IRichSpout {
 	private int count = 1000000;  
 	private FileReader fileReader;
 	private boolean completed = false;
-    private File fileSensor;
-
+    private File fileSensor1;
+    private File fileSensor2;
+    private File fileSensor3;
+    private File fileSensor4;
+    private File fileTopology;
 
 	private String deviceID = "SimpalSensor";
 	Random random;
@@ -55,9 +59,14 @@ public class SensorEmitter implements IRichSpout {
 			return;
 		} 
 		//Open the reader
-		String fromfileData = lastNlines(fileSensor,20);
-		String[] tokens=fromfileData.split("[\n]");  
-		System.out.print("data coming from file" + fromfileData + "tokens" + tokens);
+		String fromfileData1 = lastNlines(fileSensor1,20);
+		String fromfileData2 = lastNlines(fileSensor2,20);
+		String fromfileData3 = lastNlines(fileSensor3,20);
+		String fromfileData4 = lastNlines(fileSensor4,20);
+
+		String[] tokens=fromfileData1.split("[\n]");
+		
+		System.out.print("data coming from file" + fromfileData1 + "tokens" + tokens);
 		try{
 			//Read all lines
 			/*for(int i=0; i<tokens.length; i++)
@@ -66,8 +75,9 @@ public class SensorEmitter implements IRichSpout {
 				System.out.print("data coming from 1 token" + tokens[i]);
 				
 			}*/
-			this.collector.emit(new Values(fromfileData),fromfileData);
-			System.out.print("data coming from 1 token" + fromfileData);
+			
+			this.collector.emit(new Values(fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4),fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4);
+			System.out.print("data coming from 1 token" + fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4);
 			//this.collector. .emit(new Values(fromfileData),fromfileData);
 		}catch(Exception e){
 			throw new RuntimeException("Error reading tuple",e);
@@ -82,12 +92,12 @@ public class SensorEmitter implements IRichSpout {
 	 */
 	public void open(Map conf, TopologyContext context,
 			SpoutOutputCollector collector) {
-		try {
-			this.fileReader = new FileReader(conf.get("wordsFile").toString());
-			this.fileSensor = new File(conf.get("wordsFile").toString());
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Error reading file ["+conf.get("wordFile")+"]");
-		}
+		//this.fileReader = new FileReader(conf.get("wordsFile").toString());
+		String fileName = conf.get("wordsFile").toString();
+		this.fileSensor1 = new File(fileName + "1.txt");
+		this.fileSensor2 = new File(fileName + "2.txt");
+		this.fileSensor3 = new File(fileName + "3.txt");
+		this.fileSensor4 = new File(fileName + "4.txt");
 		this.collector = collector;
 	}
 

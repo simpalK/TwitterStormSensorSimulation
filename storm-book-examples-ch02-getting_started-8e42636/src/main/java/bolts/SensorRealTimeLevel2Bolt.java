@@ -29,13 +29,28 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 	  int counterVK =0;
 	  Double computeLisa=0.0;
       public  HashMap<Integer,List<String>> groupingSensors = new HashMap<Integer,List<String>>();
-      static int[][] topo = new int[][]{
-  		{1, 0, 0, 1, 0},
-  		{1, 1, 1, 0, 0},
-  		{0, 1, 1, 0, 0},
-  		{1, 0, 0, 1, 1},
-  		{1, 0, 0, 1, 1}
-  		};
+	  String[] sensorsIds = {"N-H563T",	"N-QWNZH",	"N-LETTK",	"N-SCK04",	"N-8HOVD",	"N-2GWON",	"N-UFCUA",	"N-6PFYW",	"N-TZD20",	"N-WRYAZ",	"N-3IK0Y",	"N-JQ338",	"N-Y47X6",	"N-2Z2WK",	"N-GRDHN",	"N-L04BJ"};
+
+      /*static int[][] topo = new int[][]{
+    	  {1,	1,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+          {1,	1,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+          {0,	1,	1,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+          {0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0},
+          {1,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
+          {0,	0,	0,	0,	0,	1,	1,	0,	0,	1,	0,	0,	0,	0,	0,	0},
+          {0,	0,	1,	0,	0,	1,	1,	1,	0,	0,	0,	0,	0,	0,	0,	0},
+          {0,	0,	0,	1,	0,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0},
+          {0,	0,	0,	0,	0,	0,	0,	0,	1,	1,	0,	0,	0,	0,	0,	0},
+          {0,	0,	0,	0,	0,	1,	0,	0,	1,	1,	1,	0,	0,	1,	0,	0},
+          {0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	1,	1,	0,	0,	0,	0},
+          {0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	1,	0,	0,	0,	1},
+          {0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	1,	0,	0},
+          {0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	0,	0,	1,	1,	0,	0},
+          {0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	1},
+          {0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	1,	0,	0,	1,	1}
+  		};*/
+      
+     
       @Override  
   	public void cleanup() {
   		/*System.out.println("-- Sensor Level 2 Bolt ["+name+"-"+id+"] --");
@@ -66,16 +81,16 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 		String dat = input.getString(1);
 		String[] sensorValues = dat.split(":");
 		String[] vAValues= sensorValues[0].split(",");
-		Integer vA = Integer.parseInt(vAValues[1]);
+		Double vA = Double.parseDouble(vAValues[1]);
 		Double sumOfNeighbors = 0.0;
 		
 
-		Integer[] findNeighborsVal = new Integer[1000];
+		Double[] findNeighborsVal = new Double[1000];
 		//Filter Neighbors values at same time stamp
 		for(String senseVal: sensorValues){
 			String[] vKValues= senseVal.split(",");
 			if(vKValues[2].contentEquals(vAValues[2])){
-				findNeighborsVal[counterVK++]  = Integer.parseInt(vKValues[1]);
+				findNeighborsVal[counterVK++]  = Double.parseDouble(vKValues[1]);
 				System.out.print("Find Neighbors: " +findNeighborsVal[counterVK-1] + "\n");
 			}
 		}
