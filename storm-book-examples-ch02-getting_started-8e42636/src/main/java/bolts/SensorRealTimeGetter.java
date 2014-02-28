@@ -63,7 +63,7 @@ public class SensorRealTimeGetter implements IRichBolt {
 	  
 	  @Override
 	  public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		  declarer.declare(new Fields("groupIds","word"));
+		  declarer.declare(new Fields("groupIds","word","mean","variance","timeStampMean"));
 		  }
 
 
@@ -71,6 +71,10 @@ public class SensorRealTimeGetter implements IRichBolt {
 	public void execute(Tuple input) {
 		// TODO Auto-generated method stub
 		Scanner inputStream = null;
+		  int counterVK =0;
+		  int counterSensorVal =0;
+
+
 		try
 		{
 		  inputStream = new Scanner(new File("/home/simpal/stormSensorReco/SensorSimulation/SensorSimulations/StormSensorApp/topologyInformation.txt"));//The txt file is being read correctly.
@@ -91,7 +95,29 @@ public class SensorRealTimeGetter implements IRichBolt {
 		
 		String sentence = input.getString(0);
         String[] tokens= sentence.split("\n");
-        
+		for(String senseVal: tokens){
+			counterSensorVal++;
+		}
+		Double[] findTimeStampVal = new Double[1000];
+		String[] lastTimeStamp = tokens[counterSensorVal-1].split(",");
+		Double sumOfAllSensors = 0.0;
+		Double varianceOfAllSensors = 0.0;
+		Double varianceSumOfAllSensors = 0.0;
+		//Filter Neighbors values at same time stamp
+		for(String senseVal: tokens){
+			String[] vKValues= senseVal.split(",");
+			if(vKValues[2].contentEquals(lastTimeStamp[2])){
+				findTimeStampVal[counterVK++]  = Double.parseDouble(vKValues[1]);
+				sumOfAllSensors += Double.parseDouble(vKValues[1]);
+				System.out.print("Find value at last time stamp: " +findTimeStampVal[counterVK-1] + "\n");
+			}
+		}
+		Double meanOfAllSensors = sumOfAllSensors/(counterVK-1);
+
+		for(int i=0; i< counterVK; i++){
+			varianceSumOfAllSensors += (findTimeStampVal[i] - meanOfAllSensors)*(findTimeStampVal[i] - meanOfAllSensors);
+		}
+		varianceOfAllSensors = varianceSumOfAllSensors/(counterVK-1);
         //Computing group Ids for tuples to forward for LISA compute
         for(String word : tokens){
         	String[] senseVal = word.split(",");
@@ -115,15 +141,15 @@ public class SensorRealTimeGetter implements IRichBolt {
                         			if(topoFromFile[i][l]==1 && sensePass[0].contains(sensorsIds[l]) && !sensePass[0].contains(sensorsIds[i]) && !str.contains(strPass)){
                         				str += strPass + ":";
                         				//System.out.print("looping param "+ "i:=" + i +  "l:=" + l + "k:=" +k+"\n ****");
-                        				System.out.print("String after grouping "+ "group:=" + groupIds +  str +"\n ****");
+                        				//System.out.print("String after grouping "+ "group:=" + groupIds +  str +"\n ****");
                         			}
                         			
                         		}
                           }
                     	}
                 	}
-                	collector.emit(new Values(groupIds,str));
-                    System.out.print("groupIds" + groupIds + "word" + str);
+                	collector.emit(new Values(groupIds,str,meanOfAllSensors,varianceOfAllSensors,lastTimeStamp[2]));
+                    System.out.print("groupIds" + groupIds + "word" + str + "mean" +meanOfAllSensors+  "variance"+varianceOfAllSensors +"\n");
                     groupIds = "";
                     str ="";
                 	}

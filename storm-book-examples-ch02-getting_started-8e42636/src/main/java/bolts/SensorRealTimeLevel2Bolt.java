@@ -79,8 +79,14 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 		// TODO Auto-generated method stub
 		String gid = input.getString(0);
 		String dat = input.getString(1);
+		Double mean = input.getDouble(2);
+		Double variance = input.getDouble(3);
+		String lastTimeStamp = input.getString(4);
+		
 		String[] sensorValues = dat.split(":");
+		//String[] vAValues= sensorValues[0].split(",");
 		String[] vAValues= sensorValues[0].split(",");
+
 		Double vA = Double.parseDouble(vAValues[1]);
 		Double sumOfNeighbors = 0.0;
 		
@@ -89,7 +95,7 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 		//Filter Neighbors values at same time stamp
 		for(String senseVal: sensorValues){
 			String[] vKValues= senseVal.split(",");
-			if(vKValues[2].contentEquals(vAValues[2])){
+			if(vKValues[2].contentEquals(lastTimeStamp) && !vKValues[0].contentEquals(vAValues[0])){
 				findNeighborsVal[counterVK++]  = Double.parseDouble(vKValues[1]);
 				System.out.print("Find Neighbors: " +findNeighborsVal[counterVK-1] + "\n");
 			}
@@ -101,31 +107,31 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 			sumOfNeighbors += findNeighborsVal[i];
 		}
 		//Compute mean of all neighbors
-		Double meanOfNeighbors = sumOfNeighbors/counterVK;
+		Double meanOfNeighbors = (vA + sumOfNeighbors)/(counterVK+1);
 		Double sumSquares=0.0;
 		//Compute Standrd Deviation of all neighbors
 		for(int i =0;i<counterVK;i++){
 			if(findNeighborsVal[i]!=null)
 			sumSquares += (meanOfNeighbors - findNeighborsVal[i])*(meanOfNeighbors - findNeighborsVal[i]);
 		}	
-		System.out.print("Mean of neighbors: " + meanOfNeighbors + "\n");
+		System.out.print("Mean of neighbors: " + mean + "\n");
 		System.out.print("Number of Neighbors: " + counterVK+ "\n");
 
-		System.out.print("Sum of Squares: " + sumSquares+ "\n");
+		//System.out.print("Sum of Squares: " + sumSquares+ "\n");
 		
 		Double standardDeviation = Math.sqrt(sumSquares/counterVK);
-		System.out.print("Standard Deviation: " + standardDeviation + "\n");
+		System.out.print("Variance: " + variance + "\n");
 
 		
 		//Compute LISA Algorithm
-		Double lisaEqPart1 = (vA - meanOfNeighbors)/standardDeviation;
+		Double lisaEqPart1 = (vA - mean)/variance;
 		System.out.print("Lisa Part1: " + lisaEqPart1+ "\n");
 
 		Double lisaPart2 = 0.0;
 
-		for(int i = 1;i<counterVK; i++){
+		for(int i = 0;i<counterVK; i++){
 			if(findNeighborsVal[i]!=null)
-		  lisaPart2 += (1/counterVK) * ((findNeighborsVal[i]-meanOfNeighbors)/standardDeviation);	
+		  lisaPart2 += ((1/counterVK) * (findNeighborsVal[i]-mean));	
 		}
 		System.out.print("Lisa Part2: " + lisaPart2+ "\n");
 

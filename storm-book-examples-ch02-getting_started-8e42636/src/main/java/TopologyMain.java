@@ -46,7 +46,7 @@ public class TopologyMain {
 		//                conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 3);
 		//System.setProperty("storm.jar", "/home/simpal/storm-book-examples-ch02-getting_started-8e42636/target/Getting-Started-0.0.1-SNAPSHOT.jar");
 		try {
-		        StormSubmitter.submitTopology("SensorLISATopology13", conf,
+		        StormSubmitter.submitTopology("SensorLISATopology17", conf,
 		                builder.createTopology());
 		        Thread.sleep(30000);
 		        
