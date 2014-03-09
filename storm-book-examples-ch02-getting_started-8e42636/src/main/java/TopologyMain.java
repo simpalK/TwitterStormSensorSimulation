@@ -18,12 +18,12 @@ public class TopologyMain {
          
 		//Topology definition
 		TopologyBuilder builder = new TopologyBuilder();
-		builder.setSpout("SensorEmitter",new SensorEmitter(),2);
-		builder.setBolt("SensorGetter", new SensorRealTimeGetter(),4)
+		builder.setSpout("SensorEmitter",new SensorEmitter(),4);
+		builder.setBolt("SensorGetter", new SensorRealTimeGetter(),8)
 			.allGrouping("SensorEmitter");
-		builder.setBolt("SensorBolt2", new SensorRealTimeLevel2Bolt(),6)
+		builder.setBolt("SensorBolt2", new SensorRealTimeLevel2Bolt(),16)
 		.fieldsGrouping("SensorGetter", new Fields("groupIds"));
-		builder.setBolt("SensorLisaBolt", new LISABoltOutputJSon(),6)
+		builder.setBolt("SensorLisaBolt", new LISABoltOutputJSon(),16)
 		.shuffleGrouping("SensorBolt2");
 		/*LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("SensorTtopology", conf, builder.createTopology());
@@ -34,11 +34,10 @@ public class TopologyMain {
 		
 
 		Config conf = new Config();
-		conf.setMaxTaskParallelism(3);
         conf.setNumWorkers(3);
         conf.setMaxSpoutPending(5000);
-        conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 3);
         conf.setDebug(true);
+        conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 3);
 		conf.put("wordsFile", args[0]);
 		                
 		                
@@ -46,7 +45,7 @@ public class TopologyMain {
 		//                conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, 3);
 		//System.setProperty("storm.jar", "/home/simpal/storm-book-examples-ch02-getting_started-8e42636/target/Getting-Started-0.0.1-SNAPSHOT.jar");
 		try {
-		        StormSubmitter.submitTopology("SensorLISATopology17", conf,
+		        StormSubmitter.submitTopology("SensorLISATopologyTest145_7", conf,
 		                builder.createTopology());
 		        Thread.sleep(30000);
 		        

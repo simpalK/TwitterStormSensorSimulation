@@ -26,10 +26,9 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 	  Integer id;
 	  String name;
 	  Map<String, String> counters;
-	  int counterVK =0;
 	  Double computeLisa=0.0;
       public  HashMap<Integer,List<String>> groupingSensors = new HashMap<Integer,List<String>>();
-	  String[] sensorsIds = {"N-H563T",	"N-QWNZH",	"N-LETTK",	"N-SCK04",	"N-8HOVD",	"N-2GWON",	"N-UFCUA",	"N-6PFYW",	"N-TZD20",	"N-WRYAZ",	"N-3IK0Y",	"N-JQ338",	"N-Y47X6",	"N-2Z2WK",	"N-GRDHN",	"N-L04BJ"};
+	  //String[] sensorsIds = {"N-H563T",	"N-QWNZH",	"N-LETTK",	"N-SCK04",	"N-8HOVD",	"N-2GWON",	"N-UFCUA",	"N-6PFYW",	"N-TZD20",	"N-WRYAZ",	"N-3IK0Y",	"N-JQ338",	"N-Y47X6",	"N-2Z2WK",	"N-GRDHN",	"N-L04BJ"};
 
       /*static int[][] topo = new int[][]{
     	  {1,	1,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
@@ -60,7 +59,7 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
   	}
       @Override
 	  public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		  declarer.declare(new Fields("gid","senseVal","lisaVal"));
+		  declarer.declare(new Fields("senseVal","lisaVal"));
 
       }
 	  
@@ -88,10 +87,9 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 		String[] vAValues= sensorValues[0].split(",");
 
 		Double vA = Double.parseDouble(vAValues[1]);
-		Double sumOfNeighbors = 0.0;
-		
+        int counterVK =0;
 
-		Double[] findNeighborsVal = new Double[1000];
+		Double[] findNeighborsVal = new Double[100];
 		//Filter Neighbors values at same time stamp
 		for(String senseVal: sensorValues){
 			String[] vKValues= senseVal.split(",");
@@ -102,46 +100,49 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 		}
 		
 		//Compute sum of all neighbors
-		for(int i =0;i<counterVK;i++){
+		/*for(int i =0;i<counterVK;i++){
 			if(findNeighborsVal[i]!=null)
 			sumOfNeighbors += findNeighborsVal[i];
-		}
+		}*/
 		//Compute mean of all neighbors
-		Double meanOfNeighbors = (vA + sumOfNeighbors)/(counterVK+1);
-		Double sumSquares=0.0;
+		//Double meanOfNeighbors = (vA + sumOfNeighbors)/(counterVK+1);
+		//Double sumSquares=0.0;
 		//Compute Standrd Deviation of all neighbors
-		for(int i =0;i<counterVK;i++){
+		/*for(int i =0;i<counterVK;i++){
 			if(findNeighborsVal[i]!=null)
 			sumSquares += (meanOfNeighbors - findNeighborsVal[i])*(meanOfNeighbors - findNeighborsVal[i]);
-		}	
-		System.out.print("Mean of neighbors: " + mean + "\n");
-		System.out.print("Number of Neighbors: " + counterVK+ "\n");
+		}*/	
+		System.out.print("Mean: " + mean + "\n");
+		System.out.print("Variance: " + variance + "\n");
+
+		System.out.print("Number of Neighbors: " + counterVK + "\n");
 
 		//System.out.print("Sum of Squares: " + sumSquares+ "\n");
 		
-		Double standardDeviation = Math.sqrt(sumSquares/counterVK);
-		System.out.print("Variance: " + variance + "\n");
+		//Double standardDeviation = Math.sqrt(sumSquares/counterVK);
 
 		
 		//Compute LISA Algorithm
 		Double lisaEqPart1 = (vA - mean)/variance;
-		System.out.print("Lisa Part1: " + lisaEqPart1+ "\n");
+		//System.out.print("Lisa Part1: " + lisaEqPart1+ "\n");
 
 		Double lisaPart2 = 0.0;
-
+        Double spatialRowNormal =  (1.0/(double)counterVK);
 		for(int i = 0;i<counterVK; i++){
-			if(findNeighborsVal[i]!=null)
-		  lisaPart2 += ((1/counterVK) * (findNeighborsVal[i]-mean));	
+			//if(findNeighborsVal[i]!=null)
+			//System.out.print("Lisa Part2 computation values neighbour num: " + spatialRowNormal + "mean" + mean +"value"+ findNeighborsVal[i] + "\n");
+		  lisaPart2 += spatialRowNormal * (findNeighborsVal[i]- mean);	
+			//System.out.print("Lisa Part2 computation values at step " + i + "value"+ spatialRowNormal * (findNeighborsVal[i]- mean) + "\n");
+
 		}
-		System.out.print("Lisa Part2: " + lisaPart2+ "\n");
+		//System.out.print("Lisa Part2: " + lisaPart2+ "\n");
 
 		computeLisa = lisaEqPart1 * lisaPart2;
 		
 		
-		System.out.print("Bolt2: " + gid + "Information: " + vAValues[0] + vAValues[1] + vAValues[2] + "Va: "+vA+  "LISA Value:" + computeLisa + "\n");
-		collector.emit(new Values(gid,sensorValues[0],computeLisa));
+		System.out.print("Bolt Information for node: " + vAValues[0] +"," + vAValues[1] + "," + vAValues[2] + "Va: "+vA+  "LISA Value:" + computeLisa + "\n");
+		collector.emit(new Values(sensorValues[0],computeLisa));
 		collector.ack(input);
-		counterVK =0;
 	}
 	@Override
 	public Map<String, Object> getComponentConfiguration() {

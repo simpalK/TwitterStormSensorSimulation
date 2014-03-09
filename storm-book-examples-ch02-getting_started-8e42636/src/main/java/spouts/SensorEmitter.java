@@ -59,14 +59,14 @@ public class SensorEmitter implements IRichSpout {
 			return;
 		} 
 		//Open the reader
-		String fromfileData1 = lastNlines(fileSensor1,20);
-		String fromfileData2 = lastNlines(fileSensor2,20);
-		String fromfileData3 = lastNlines(fileSensor3,20);
-		String fromfileData4 = lastNlines(fileSensor4,20);
+		String fromfileData1 = lastNlines(fileSensor1,400);
+		String fromfileData2 = lastNlines(fileSensor2,400);
+		String fromfileData3 = lastNlines(fileSensor3,400);
+		String fromfileData4 = lastNlines(fileSensor4,400);
 
 		String[] tokens=fromfileData1.split("[\n]");
 		
-		System.out.print("data coming from file" + fromfileData1 + "tokens" + tokens);
+		//System.out.print("data coming from file" + fromfileData1 + "tokens" + tokens);
 		try{
 			//Read all lines
 			/*for(int i=0; i<tokens.length; i++)
@@ -77,7 +77,7 @@ public class SensorEmitter implements IRichSpout {
 			}*/
 			
 			this.collector.emit(new Values(fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4),fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4);
-			System.out.print("data coming from 1 token" + fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4);
+			//System.out.print("data coming from 1 token" + fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4);
 			//this.collector. .emit(new Values(fromfileData),fromfileData);
 		}catch(Exception e){
 			throw new RuntimeException("Error reading tuple",e);

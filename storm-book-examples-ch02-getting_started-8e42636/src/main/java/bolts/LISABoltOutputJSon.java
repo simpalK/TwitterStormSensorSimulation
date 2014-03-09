@@ -41,7 +41,7 @@ public class LISABoltOutputJSon implements IRichBolt {
 	  int counterVK =0;
 	  Double computeLisa=0.0;
       public  HashMap<Integer,List<String>> groupingSensors = new HashMap<Integer,List<String>>();
-	  String[] sensorsIds = {"N-H563T",	"N-QWNZH",	"N-LETTK",	"N-SCK04",	"N-8HOVD",	"N-2GWON",	"N-UFCUA",	"N-6PFYW",	"N-TZD20",	"N-WRYAZ",	"N-3IK0Y",	"N-JQ338",	"N-Y47X6",	"N-2Z2WK",	"N-GRDHN",	"N-L04BJ"};
+	  //String[] sensorsIds = {"N-H563T",	"N-QWNZH",	"N-LETTK",	"N-SCK04",	"N-8HOVD",	"N-2GWON",	"N-UFCUA",	"N-6PFYW",	"N-TZD20",	"N-WRYAZ",	"N-3IK0Y",	"N-JQ338",	"N-Y47X6",	"N-2Z2WK",	"N-GRDHN",	"N-L04BJ"};
 
       /*static int[][] topo = new int[][]{    	  
         	  {1,	1,	0,	0,	1,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0},
@@ -85,19 +85,21 @@ public class LISABoltOutputJSon implements IRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		// TODO Auto-generated method stub
-		String gid = input.getString(0);
-		String dat = input.getString(1);
+		//String gid = input.getString(0);
+		String dat = input.getString(0);
 		String[] sensorValues = dat.split(",");
-		Double lisaVal = input.getDouble(2);
-		String value= gid + "," + dat + "," + lisaVal ;
+		Double lisaVal = input.getDouble(1);
+		String value= dat + "," + lisaVal ;
 		
 		try {
+			if(sensorValues[0].contentEquals("N-H82EQ")){
 			File file = new File(jsonFilePath);
 			jsonFileWriter = new FileWriter(file.getAbsoluteFile(),true);
 			BufferedWriter bw = new BufferedWriter(jsonFileWriter);			
 			bw.write(value);
 			bw.newLine();
 			bw.close();
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
