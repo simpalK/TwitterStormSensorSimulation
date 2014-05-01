@@ -31,7 +31,7 @@ import org.json.simple.JSONObject;
 public class LISABoltOutputJSon implements IRichBolt {
 
 	  private static final long serialVersionUID = 1L;
-      private static final String jsonFilePath = "/home/simpal/stormSensorReco/SensorSimulation/SensorSimulations/StormSensorApp/jsonSensorFile.txt";
+      String jsonFilePath;// = "/home/simpal/stormSensorReco/SensorSimulation/SensorSimulations/StormSensorApp/jsonSensorFile.txt";
 	  FileWriter jsonFileWriter;
 
 	  private OutputCollector collector;
@@ -79,7 +79,7 @@ public class LISABoltOutputJSon implements IRichBolt {
 		this.counters = new HashMap<String, String>();
 		this.name = context.getThisComponentId();
 		this.id = context.getThisTaskId();
-		
+		this.jsonFilePath = stormConf.get("wordsFile").toString() + "/jsonSensorFile.txt";	
 		
 	}
 	@Override
@@ -92,14 +92,14 @@ public class LISABoltOutputJSon implements IRichBolt {
 		String value= dat + "," + lisaVal ;
 		
 		try {
-			if(sensorValues[0].contentEquals("N-H82EQ")){
+			//if(sensorValues[0].contentEquals("N-H82EQ")){
 			File file = new File(jsonFilePath);
 			jsonFileWriter = new FileWriter(file.getAbsoluteFile(),true);
 			BufferedWriter bw = new BufferedWriter(jsonFileWriter);			
 			bw.write(value);
 			bw.newLine();
 			bw.close();
-			}
+			//}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

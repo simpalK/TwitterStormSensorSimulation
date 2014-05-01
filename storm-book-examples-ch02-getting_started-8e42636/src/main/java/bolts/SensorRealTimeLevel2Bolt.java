@@ -100,10 +100,14 @@ public class SensorRealTimeLevel2Bolt implements IRichBolt {
 		}
 		
 		//Compute sum of all neighbors
-		/*for(int i =0;i<counterVK;i++){
+		Double sumOfNeighbors =0.0;
+		for(int i =0;i<counterVK;i++){
 			if(findNeighborsVal[i]!=null)
 			sumOfNeighbors += findNeighborsVal[i];
-		}*/
+		}
+		if(counterVK>1)
+		System.out.print("Mean of Neighbors: " +sumOfNeighbors/counterVK + "\n");
+
 		//Compute mean of all neighbors
 		//Double meanOfNeighbors = (vA + sumOfNeighbors)/(counterVK+1);
 		//Double sumSquares=0.0;

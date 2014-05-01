@@ -1,0 +1,13 @@
+{
+"root": "root",
+"children":[
+{
+ "groupId": "11100",
+ "values":[{"SensorId": "1", "lisaVal": null}]         
+},
+{
+ "groupId": "11100",
+ "values":[{"SensorId": "2", "lisaVal": 0.0}]         
+}
+]
+}

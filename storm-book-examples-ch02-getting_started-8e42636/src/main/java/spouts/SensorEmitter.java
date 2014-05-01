@@ -17,6 +17,7 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import bolts.GlobalVar;
 
 public class SensorEmitter implements IRichSpout {
 
@@ -29,6 +30,7 @@ public class SensorEmitter implements IRichSpout {
     private File fileSensor3;
     private File fileSensor4;
     private File fileTopology;
+    
 
 	private String deviceID = "SimpalSensor";
 	Random random;
@@ -51,7 +53,7 @@ public class SensorEmitter implements IRichSpout {
 		 */
 		if(completed){
 			try {
-				Thread.sleep(30000);
+				Thread.sleep(3000);
 				completed = false;
 			} catch (InterruptedException e) {
 				//Do nothing
@@ -59,10 +61,10 @@ public class SensorEmitter implements IRichSpout {
 			return;
 		} 
 		//Open the reader
-		String fromfileData1 = lastNlines(fileSensor1,400);
-		String fromfileData2 = lastNlines(fileSensor2,400);
+		String fromfileData1 = lastNlines(fileSensor1,GlobalVar.numberOfNodes);
+		/*String fromfileData2 = lastNlines(fileSensor2,400);
 		String fromfileData3 = lastNlines(fileSensor3,400);
-		String fromfileData4 = lastNlines(fileSensor4,400);
+		String fromfileData4 = lastNlines(fileSensor4,400);*/
 
 		String[] tokens=fromfileData1.split("[\n]");
 		
@@ -75,8 +77,9 @@ public class SensorEmitter implements IRichSpout {
 				System.out.print("data coming from 1 token" + tokens[i]);
 				
 			}*/
-			
-			this.collector.emit(new Values(fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4),fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4);
+			this.collector.emit(new Values(fromfileData1),fromfileData1);
+
+			//this.collector.emit(new Values(fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4),fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4);
 			//System.out.print("data coming from 1 token" + fromfileData1 + fromfileData2 + fromfileData3 + fromfileData4);
 			//this.collector. .emit(new Values(fromfileData),fromfileData);
 		}catch(Exception e){
@@ -94,10 +97,11 @@ public class SensorEmitter implements IRichSpout {
 			SpoutOutputCollector collector) {
 		//this.fileReader = new FileReader(conf.get("wordsFile").toString());
 		String fileName = conf.get("wordsFile").toString();
-		this.fileSensor1 = new File(fileName + "1.txt");
-		this.fileSensor2 = new File(fileName + "2.txt");
+		GlobalVar.numberOfNodes = Integer.parseInt(conf.get("numberOfNodes").toString());
+		this.fileSensor1 = new File(fileName + "/logSensorsData.txt");
+		/*this.fileSensor2 = new File(fileName + "2.txt");
 		this.fileSensor3 = new File(fileName + "3.txt");
-		this.fileSensor4 = new File(fileName + "4.txt");
+		this.fileSensor4 = new File(fileName + "4.txt");*/
 		this.collector = collector;
 	}
 
